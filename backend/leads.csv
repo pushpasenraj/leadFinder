@@ -1,0 +1,6 @@
+id,company_name,city,state,industry,employee_size,revenue,email
+1,Alpha Tech,Chennai,Tamil Nadu,Software,50,500000,info@alphatech.com
+2,Bright Foods,Coimbatore,Tamil Nadu,Food,25,250000,contact@brightfoods.com
+3,Green Farms,Madurai,Tamil Nadu,Agriculture,100,800000,hello@greenfarms.com
+4,Cloud Data RX,Bangalore,Karnataka,IT Services,75,650000,support@clouddatarx.com
+5,Metro Retail,Chennai,Tamil Nadu,Retail,30,300000,sales@metroretail.com
