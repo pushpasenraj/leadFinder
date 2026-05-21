@@ -13,14 +13,14 @@ export default function Home() {
   }, [])
 
   function getAllLeads() {
-    fetch("http://127.0.0.1:8000/leads")
+    fetch("https://leadfinder-d7e2.onrender.com/leads")
       .then((response) => response.json())
       .then((data) => setLeads(data))
       .catch((error) => console.log(error))
   }
 
   function searchLeads() {
-    fetch("http://127.0.0.1:8000/filter-leads", {
+    fetch("https://leadfinder-d7e2.onrender.com/filter-leads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
