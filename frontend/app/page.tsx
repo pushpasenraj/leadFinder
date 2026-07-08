@@ -15,6 +15,15 @@ export default function Home() {
     message: "",
   })
 
+  const [chatOpen, setChatOpen] = useState(false)
+  const [chatMessage, setChatMessage] = useState("")
+  const [chatHistory, setChatHistory] = useState<any[]>([
+    {
+      sender: "bot",
+      text: "Hello! I am LeadFinder Assistant. How can I help you?",
+    },
+  ])
+
   useEffect(() => {
     getAllLeads()
   }, [])
@@ -62,6 +71,52 @@ export default function Home() {
     { label: "Contact", href: "#contact" },
   ]
 
+  function sendChatMessage() {
+    if (chatMessage.trim() === "") {
+      return
+    }
+  
+    const userText = chatMessage
+  
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        sender: "user",
+        text: userText
+      }
+    ])
+  
+    setChatMessage("")
+  
+    fetch("https://leadfinder-d7e2.onrender.com/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: userText
+      })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: data.bot_reply
+          }
+        ])
+      })
+      .catch(() => {
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: "Sorry, chatbot service is not available right now."
+          }
+        ])
+      })
+  }
   return (
     <main className="min-h-screen bg-white">
       <header className="flex items-center justify-between px-4 sm:px-10 py-5 bg-gray-100">
@@ -388,6 +443,69 @@ export default function Home() {
       <footer className="bg-blue-700 text-white text-center py-6 px-4">
         <p>© 2026 LeadFinder. All Rights Reserved.</p>
       </footer>
+
+      <div className="fixed bottom-6 right-6 z-50">
+        {chatOpen && (
+          <div className="w-80 h-96 bg-white shadow-2xl rounded-lg border flex flex-col overflow-hidden">
+            <div className="bg-blue-700 text-white p-4 font-bold flex justify-between items-center">
+              <span>LeadFinder Assistant</span>
+              <button onClick={() => setChatOpen(false)}>X</button>
+            </div>
+
+            <div className="flex-1 p-3 overflow-y-auto bg-gray-50">
+              {chatHistory.map((chat, index) => (
+                <div
+                  key={index}
+                  className={`mb-3 ${
+                    chat.sender === "user" ? "text-right" : "text-left"
+                  }`}
+                >
+                  <span
+                    className={`inline-block px-3 py-2 rounded text-sm ${
+                      chat.sender === "user"
+                        ? "bg-blue-700 text-white"
+                        : "bg-gray-200 text-gray-900"
+                    }`}
+                  >
+                    {chat.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-3 border-t flex gap-2">
+              <input
+                type="text"
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendChatMessage()
+                  }
+                }}
+                placeholder="Type message..."
+                className="flex-1 border rounded px-3 py-2 text-gray-900"
+              />
+
+              <button
+                onClick={sendChatMessage}
+                className="bg-blue-700 text-white px-4 py-2 rounded"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!chatOpen && (
+          <button
+            onClick={() => setChatOpen(true)}
+            className="bg-red-600 text-white px-5 py-4 rounded-full shadow-lg font-bold hover:bg-red-700"
+          >
+            Chat
+          </button>
+        )}
+      </div>
     </main>
   )
 }

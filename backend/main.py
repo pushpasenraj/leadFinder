@@ -24,6 +24,8 @@ class FilterRequest(BaseModel):
     state: str | None = None
     industry: str | None = None
 
+class ChatRequest(BaseModel):
+    message: str
 
 @app.get("/")
 def home():
@@ -62,4 +64,43 @@ def get_stats():
     return {
         "total_leads": total_leads,
         "average_employees": round(float(average_employees), 2)
+    }
+
+@app.post("/chat")
+def chatbot(request: ChatRequest):
+    message = request.message.lower()
+
+    if "hello" in message or "hi" in message:
+        reply = "Hello! Welcome to LeadFinder. How can I help you?"
+
+    elif "leadfinder" in message or "about" in message:
+        reply = "LeadFinder is a business lead search platform that helps users find targeted leads by city, state, industry, and other filters."
+
+    elif "service" in message or "services" in message:
+        reply = "We provide Business Leads, Email Marketing Lists, Industry Targeting, Smart Search, and Lead Scoring."
+
+    elif "business lead" in message or "business leads" in message:
+        reply = "Business leads help you find companies that match your target market, location, and industry."
+
+    elif "email" in message or "email list" in message:
+        reply = "Our email list feature helps businesses reach targeted prospects for marketing campaigns."
+
+    elif "lead score" in message or "scoring" in message:
+        reply = "Lead scoring helps classify prospects as High, Medium, or Low priority based on company data."
+
+    elif "smart search" in message or "nlp" in message:
+        reply = "Smart Search uses simple NLP keyword matching to understand natural language searches like 'Find software companies in California'."
+
+    elif "contact" in message:
+        reply = "You can contact us using the Contact section on this website."
+
+    elif "help" in message:
+        reply = "You can ask me about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
+
+    else:
+        reply = "Sorry, I am still learning. Please ask about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
+
+    return {
+        "user_message": request.message,
+        "bot_reply": reply
     }
