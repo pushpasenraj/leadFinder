@@ -24,8 +24,10 @@ class FilterRequest(BaseModel):
     state: str | None = None
     industry: str | None = None
 
+
 class ChatRequest(BaseModel):
     message: str
+
 
 @app.get("/")
 def home():
@@ -66,17 +68,65 @@ def get_stats():
         "average_employees": round(float(average_employees), 2)
     }
 
+
 @app.post("/chat")
 def chatbot(request: ChatRequest):
     message = request.message.lower()
 
-    if "hello" in message or "hi" in message or "hey" in message or "hey there" in message or "good morning" in message or "good afternoon" in message or "good evening" in message or "good night" in message or "morning" in message or "afternoon" in message or "evening" in message or "night" in message or "greetings" in message or "greeting" in message or "hi there" in message or "hello there" in message or "hello to you" in message or "hi to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hey there to you" in message or "good morning to you" in message or "good afternoon to you" in message or "good evening to you" in message or "good night to you" in message or "morning to you" in message or "afternoon to you" in message or "evening to you" in message or "night to you" in message or "greetings to you" in message or "greeting to you" in message or "hi to you" in message or "hello to you" in message or "hey to you" in message or "hai" in message:
+    greeting_keywords = [
+        "hello", "hi", "hey", "hai",
+        "good morning", "good afternoon",
+        "good evening", "good night"
+    ]
+
+    if any(word in message for word in greeting_keywords):
         reply = "Hello! Welcome to LeadFinder. How can I help you?"
 
-    elif "leadfinder" in message or "about" in message:
-        reply = "LeadFinder is a business lead search platform that helps users find targeted leads by city, state, industry, and other filters."
+    elif "find" in message or "show" in message or "search" in message:
+        df = pd.read_csv(CSV_FILE)
 
-    elif "service" in message or "services" in message:
+        detected_city = None
+        detected_state = None
+        detected_industry = None
+
+        for city in df["city"].unique():
+            if city.lower() in message:
+                detected_city = city
+
+        for state in df["state"].unique():
+            if state.lower() in message:
+                detected_state = state
+
+        for industry in df["industry"].unique():
+            if industry.lower() in message:
+                detected_industry = industry
+
+        if detected_city:
+            df = df[df["city"].str.lower() == detected_city.lower()]
+
+        if detected_state:
+            df = df[df["state"].str.lower() == detected_state.lower()]
+
+        if detected_industry:
+            df = df[df["industry"].str.lower() == detected_industry.lower()]
+
+        if len(df) == 0:
+            reply = "Sorry, I could not find matching leads for your search."
+        else:
+            reply = f"I found {len(df)} matching lead(s):\n"
+
+            for _, row in df.head(3).iterrows():
+                reply += (
+                    f"- {row['company_name']} | "
+                    f"{row['city']} | "
+                    f"{row['industry']} | "
+                    f"{row['employee_size']} employees\n"
+                )
+
+    elif "contact" in message:
+        reply = "You can contact us using the Contact section on this website."
+
+    elif "service" in message or "services" in message or "provide" in message:
         reply = "We provide Business Leads, Email Marketing Lists, Industry Targeting, Smart Search, and Lead Scoring."
 
     elif "business lead" in message or "business leads" in message:
@@ -91,11 +141,11 @@ def chatbot(request: ChatRequest):
     elif "smart search" in message or "nlp" in message:
         reply = "Smart Search uses simple NLP keyword matching to understand natural language searches like 'Find software companies in California'."
 
-    elif "contact" in message:
-        reply = "You can contact us using the Contact section on this website."
-
     elif "help" in message:
         reply = "You can ask me about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
+
+    elif "leadfinder" in message or "about" in message:
+        reply = "LeadFinder is a business lead search platform that helps users find targeted leads by city, state, industry, and other filters."
 
     else:
         reply = "Sorry, I am still learning. Please ask about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
