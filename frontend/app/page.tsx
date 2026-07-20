@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useEffect, useRef, useState } from "react"
 
 export default function Home() {
   const [leads, setLeads] = useState<any[]>([])
@@ -24,6 +24,11 @@ export default function Home() {
     },
   ])
 
+  const chatBottomRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [chatHistory])
+  
   useEffect(() => {
     getAllLeads()
   }, [])
@@ -471,6 +476,7 @@ export default function Home() {
                   </span>
                 </div>
               ))}
+              <div ref={chatBottomRef}></div>
             </div>
 
             <div className="p-3 border-t flex gap-2">
