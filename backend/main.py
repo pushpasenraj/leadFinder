@@ -72,19 +72,67 @@ def get_stats():
 def detect_intent(message):
     message = message.lower()
 
-    greeting_keywords = ["hello", "hi", "hey", "hai"]
-    service_keywords = ["service", "services", "provide", "offer"]
-    contact_keywords = ["contact", "phone", "email", "reach"]
-    lead_score_keywords = ["lead score", "scoring", "priority", "hot lead"]
-    smart_search_keywords = ["smart search", "nlp", "natural language"]
-    lead_search_keywords = ["find", "show", "search"]
-    about_keywords = ["about", "leadfinder"]
+    greeting_keywords = [
+        "hello", "hi", "hey", "hai",
+        "good morning", "good afternoon",
+        "good evening", "good night"
+    ]
+
+    service_keywords = [
+        "service", "services", "provide", "offer",
+        "what do you do"
+    ]
+
+    contact_keywords = [
+        "contact", "phone", "email", "reach",
+        "call", "support"
+    ]
+
+    lead_score_keywords = [
+        "lead score", "lead scoring", "scoring",
+        "priority", "hot lead"
+    ]
+
+    smart_search_keywords = [
+        "smart search", "nlp", "natural language"
+    ]
+
+    lead_search_keywords = [
+        "find", "show", "search", "get me",
+        "companies in", "businesses in"
+    ]
+
+    lead_info_keywords = [
+        "what is lead", "what are leads",
+        "business lead", "business leads",
+        "lead meaning", "about lead"
+    ]
+
+    list_keywords = [
+        "list", "lists", "email list",
+        "marketing list", "business list",
+        "lead list"
+    ]
+
+    about_keywords = [
+        "about", "leadfinder", "who are you"
+    ]
+
+    help_keywords = [
+        "help", "how to use", "what can you do"
+    ]
 
     if any(word in message for word in greeting_keywords):
         return "greeting"
 
     if any(word in message for word in lead_search_keywords):
         return "lead_search"
+
+    if any(word in message for word in lead_info_keywords):
+        return "lead_info"
+
+    if any(word in message for word in list_keywords):
+        return "lists"
 
     if any(word in message for word in contact_keywords):
         return "contact"
@@ -98,6 +146,9 @@ def detect_intent(message):
     if any(word in message for word in smart_search_keywords):
         return "smart_search"
 
+    if any(word in message for word in help_keywords):
+        return "help"
+
     if any(word in message for word in about_keywords):
         return "about"
 
@@ -105,7 +156,8 @@ def detect_intent(message):
 
 @app.post("/chat")
 def chatbot(request: ChatRequest):
-    message = request.message.lower()
+    message = request.me
+    ssage.lower()
     intent = detect_intent(message)
 
     if intent == "greeting":
@@ -167,6 +219,15 @@ def chatbot(request: ChatRequest):
 
     elif intent == "about":
         reply = "LeadFinder is a business lead search platform that helps users find targeted leads."
+    
+    elif intent == "lead_info":
+        reply = "A lead is a potential customer or business contact who may be interested in your product or service."
+
+    elif intent == "lists":
+        reply = "LeadFinder provides business lists and email marketing lists to help you reach targeted companies and prospects."
+
+    elif intent == "help":
+        reply = "You can ask me about services, business leads, email lists, lead scoring, smart search, contact, or search leads by city and industry."
 
     else:
         reply = "Sorry, I am still learning. Please ask about services, contact, lead scoring, or search leads."
