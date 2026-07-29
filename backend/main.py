@@ -69,20 +69,49 @@ def get_stats():
     }
 
 
+def detect_intent(message):
+    message = message.lower()
+
+    greeting_keywords = ["hello", "hi", "hey", "hai"]
+    service_keywords = ["service", "services", "provide", "offer"]
+    contact_keywords = ["contact", "phone", "email", "reach"]
+    lead_score_keywords = ["lead score", "scoring", "priority", "hot lead"]
+    smart_search_keywords = ["smart search", "nlp", "natural language"]
+    lead_search_keywords = ["find", "show", "search"]
+    about_keywords = ["about", "leadfinder"]
+
+    if any(word in message for word in greeting_keywords):
+        return "greeting"
+
+    if any(word in message for word in lead_search_keywords):
+        return "lead_search"
+
+    if any(word in message for word in contact_keywords):
+        return "contact"
+
+    if any(word in message for word in service_keywords):
+        return "services"
+
+    if any(word in message for word in lead_score_keywords):
+        return "lead_score"
+
+    if any(word in message for word in smart_search_keywords):
+        return "smart_search"
+
+    if any(word in message for word in about_keywords):
+        return "about"
+
+    return "unknown"
+
 @app.post("/chat")
 def chatbot(request: ChatRequest):
     message = request.message.lower()
+    intent = detect_intent(message)
 
-    greeting_keywords = [
-        "hello", "hi", "hey", "hai",
-        "good morning", "good afternoon",
-        "good evening", "good night"
-    ]
-
-    if any(word in message for word in greeting_keywords):
+    if intent == "greeting":
         reply = "Hello! Welcome to LeadFinder. How can I help you?"
 
-    elif "find" in message or "show" in message or "search" in message:
+    elif intent == "lead_search":
         df = pd.read_csv(CSV_FILE)
 
         detected_city = None
@@ -123,34 +152,27 @@ def chatbot(request: ChatRequest):
                     f"{row['employee_size']} employees\n"
                 )
 
-    elif "contact" in message:
+
+    elif intent == "contact":
         reply = "You can contact us using the Contact section on this website."
 
-    elif "service" in message or "services" in message or "provide" in message:
+    elif intent == "services":
         reply = "We provide Business Leads, Email Marketing Lists, Industry Targeting, Smart Search, and Lead Scoring."
 
-    elif "business lead" in message or "business leads" in message:
-        reply = "Business leads help you find companies that match your target market, location, and industry."
+    elif intent == "lead_score":
+        reply = "Lead scoring helps classify prospects as High, Medium, or Low priority."
 
-    elif "email" in message or "email list" in message:
-        reply = "Our email list feature helps businesses reach targeted prospects for marketing campaigns."
+    elif intent == "smart_search":
+        reply = "Smart Search uses NLP keyword matching to understand natural language searches."
 
-    elif "lead score" in message or "scoring" in message:
-        reply = "Lead scoring helps classify prospects as High, Medium, or Low priority based on company data."
-
-    elif "smart search" in message or "nlp" in message:
-        reply = "Smart Search uses simple NLP keyword matching to understand natural language searches like 'Find software companies in California'."
-
-    elif "help" in message:
-        reply = "You can ask me about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
-
-    elif "leadfinder" in message or "about" in message:
-        reply = "LeadFinder is a business lead search platform that helps users find targeted leads by city, state, industry, and other filters."
+    elif intent == "about":
+        reply = "LeadFinder is a business lead search platform that helps users find targeted leads."
 
     else:
-        reply = "Sorry, I am still learning. Please ask about LeadFinder, services, business leads, email lists, smart search, lead scoring, or contact."
+        reply = "Sorry, I am still learning. Please ask about services, contact, lead scoring, or search leads."
 
     return {
         "user_message": request.message,
+        "intent": intent,
         "bot_reply": reply
     }
