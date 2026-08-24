@@ -14,7 +14,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://lead-finder-opal.vercel.app",
         "https://pushpakannan-leadfinder-chatbot.hf.space",
-        "https://huggingface.co"
+        "https://huggingface.co",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -71,61 +71,93 @@ def get_stats():
 
     return {
         "total_leads": total_leads,
-        "average_employees": round(float(average_employees), 2)
+        "average_employees": round(float(average_employees), 2),
     }
 
 
-def detect_intent(message):
+def detect_intent(message: str):
     message = message.lower()
 
     greeting_keywords = [
-        "hello", "hi", "hey", "hai",
-        "good morning", "good afternoon",
-        "good evening", "good night"
+        "hello",
+        "hi",
+        "hey",
+        "hai",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "good night",
     ]
 
     service_keywords = [
-        "service", "services", "provide", "offer",
-        "what do you do"
+        "service",
+        "services",
+        "provide",
+        "offer",
+        "what do you do",
     ]
 
     contact_keywords = [
-        "contact", "phone", "email", "reach",
-        "call", "support"
+        "contact",
+        "phone",
+        "email",
+        "reach",
+        "call",
+        "support",
     ]
 
     lead_score_keywords = [
-        "lead score", "lead scoring", "scoring",
-        "priority", "hot lead"
+        "lead score",
+        "lead scoring",
+        "lead_score",
+        "scoring",
+        "priority",
+        "hot lead",
     ]
 
     smart_search_keywords = [
-        "smart search", "nlp", "natural language"
+        "smart search",
+        "nlp",
+        "natural language",
     ]
 
     lead_search_keywords = [
-        "find", "show", "search", "get me",
-        "companies in", "businesses in"
+        "find",
+        "show",
+        "search",
+        "get me",
+        "companies in",
+        "businesses in",
     ]
 
     lead_info_keywords = [
-        "what is lead", "what are leads",
-        "business lead", "business leads",
-        "lead meaning", "about lead"
+        "what is lead",
+        "what are leads",
+        "business lead",
+        "business leads",
+        "lead meaning",
+        "about lead",
     ]
 
     list_keywords = [
-        "list", "lists", "email list",
-        "marketing list", "business list",
-        "lead list"
+        "list",
+        "lists",
+        "email list",
+        "marketing list",
+        "business list",
+        "lead list",
     ]
 
     about_keywords = [
-        "about", "leadfinder", "who are you"
+        "about",
+        "leadfinder",
+        "who are you",
     ]
 
     help_keywords = [
-        "help", "how to use", "what can you do"
+        "help",
+        "how to use",
+        "what can you do",
     ]
 
     if any(word in message for word in greeting_keywords):
@@ -160,10 +192,10 @@ def detect_intent(message):
 
     return "unknown"
 
+
 @app.post("/chat")
 def chatbot(request: ChatRequest):
-    message = request.me
-    ssage.lower()
+    message = request.message.lower()
     intent = detect_intent(message)
 
     if intent == "greeting":
@@ -176,26 +208,26 @@ def chatbot(request: ChatRequest):
         detected_state = None
         detected_industry = None
 
-        for city in df["city"].unique():
-            if city.lower() in message:
+        for city in df["city"].dropna().unique():
+            if str(city).lower() in message:
                 detected_city = city
 
-        for state in df["state"].unique():
-            if state.lower() in message:
+        for state in df["state"].dropna().unique():
+            if str(state).lower() in message:
                 detected_state = state
 
-        for industry in df["industry"].unique():
-            if industry.lower() in message:
+        for industry in df["industry"].dropna().unique():
+            if str(industry).lower() in message:
                 detected_industry = industry
 
         if detected_city:
-            df = df[df["city"].str.lower() == detected_city.lower()]
+            df = df[df["city"].str.lower() == str(detected_city).lower()]
 
         if detected_state:
-            df = df[df["state"].str.lower() == detected_state.lower()]
+            df = df[df["state"].str.lower() == str(detected_state).lower()]
 
         if detected_industry:
-            df = df[df["industry"].str.lower() == detected_industry.lower()]
+            df = df[df["industry"].str.lower() == str(detected_industry).lower()]
 
         if len(df) == 0:
             reply = "Sorry, I could not find matching leads for your search."
@@ -210,36 +242,59 @@ def chatbot(request: ChatRequest):
                     f"{row['employee_size']} employees\n"
                 )
 
-
     elif intent == "contact":
         reply = "You can contact us using the Contact section on this website."
 
     elif intent == "services":
-        reply = "We provide Business Leads, Email Marketing Lists, Industry Targeting, Smart Search, and Lead Scoring."
+        reply = (
+            "We provide Business Leads, Email Marketing Lists, "
+            "Industry Targeting, Smart Search, and Lead Scoring."
+        )
 
     elif intent == "lead_score":
-        reply = "Lead scoring helps classify prospects as High, Medium, or Low priority."
+        reply = (
+            "Lead scoring helps classify prospects as High, Medium, "
+            "or Low priority based on company data."
+        )
 
     elif intent == "smart_search":
-        reply = "Smart Search uses NLP keyword matching to understand natural language searches."
+        reply = (
+            "Smart Search uses NLP keyword matching to understand "
+            "natural language searches like 'Find software companies in Chennai'."
+        )
 
-    elif intent == "about":
-        reply = "LeadFinder is a business lead search platform that helps users find targeted leads."
-    
     elif intent == "lead_info":
-        reply = "A lead is a potential customer or business contact who may be interested in your product or service."
+        reply = (
+            "A lead is a potential customer or business contact who may be "
+            "interested in your product or service."
+        )
 
     elif intent == "lists":
-        reply = "LeadFinder provides business lists and email marketing lists to help you reach targeted companies and prospects."
+        reply = (
+            "LeadFinder provides business lists and email marketing lists "
+            "to help you reach targeted companies and prospects."
+        )
 
     elif intent == "help":
-        reply = "You can ask me about services, business leads, email lists, lead scoring, smart search, contact, or search leads by city and industry."
+        reply = (
+            "You can ask me about services, business leads, email lists, "
+            "lead scoring, smart search, contact, or search leads by city and industry."
+        )
+
+    elif intent == "about":
+        reply = (
+            "LeadFinder is a business lead search platform that helps users "
+            "find targeted leads by city, state, industry, and other filters."
+        )
 
     else:
-        reply = "Sorry, I am still learning. Please ask about services, contact, lead scoring, or search leads."
+        reply = (
+            "Sorry, I am still learning. Please ask about services, contact, "
+            "lead scoring, email lists, business leads, or search leads."
+        )
 
     return {
         "user_message": request.message,
         "intent": intent,
-        "bot_reply": reply
+        "bot_reply": reply,
     }
