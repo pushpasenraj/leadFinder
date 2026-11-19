@@ -33,6 +33,12 @@ export default function Home() {
     getAllLeads()
   }, [])
 
+  useEffect(() => {
+    fetch("https://leadfinder-d7e2.onrender.com/")
+      .then(() => console.log("Backend wake up success"))
+      .catch((error) => console.log("Backend wake up error:", error))
+  }, [])
+  
   function getAllLeads() {
     fetch("https://leadfinder-d7e2.onrender.com/leads")
       .then((response) => response.json())

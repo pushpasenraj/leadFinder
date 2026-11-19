@@ -14,6 +14,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://lead-finder-opal.vercel.app",
         "https://pushpakannan-leadfinder-chatbot.hf.space",
+        "https://pushpakannan-leadfinder-chatbot.static.hf.space",
         "https://huggingface.co",
     ],
     allow_credentials=True,
@@ -295,6 +296,7 @@ def chatbot(request: ChatRequest):
 
     return {
         "user_message": request.message,
+        "intent": intent,
         "intent": intent,
         "bot_reply": reply,
     }
